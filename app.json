@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ShoppingList",
-    "slug": "ShoppingList",
+    "name": "장보러갈래?",
+    "slug": "shoppingList",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,10 +21,22 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.youngyoung.shoppingList"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "bd293604-d777-4a2c-ab29-bbad7a9da8ba"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/bd293604-d777-4a2c-ab29-bbad7a9da8ba"
     }
   }
 }
