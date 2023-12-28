@@ -1,7 +1,7 @@
 export const theme = {
     background: "#F3F4F6",
     subBackground: "white",
-    itemBackground: "",
+    itemBackground: "#111111",
 
     font:"black",
     subFont: "grey",

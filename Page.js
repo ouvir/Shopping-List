@@ -1,7 +1,8 @@
-import { StyleSheet, Text, ScrollView, View, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, Text, ScrollView, View, TouchableOpacity, Dimensions, TextInput, Vibration, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { theme } from './colors';
 import React from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const { width: DEVICE_WIDTH } = Dimensions.get("window");
 
@@ -18,24 +19,58 @@ const Item = (props) => {
 
 //get index, items, pageName
 export const Page = (props) => {
+    const [edit, setEdit] = useState(false);
+    const textInputRef = useRef();
     const items = props.items;
+
+
+    // when chage pageName, catch the focus for async
+    useEffect(() => {
+        if (edit && textInputRef.current) {
+            textInputRef.current.focus();
+        }
+    }, [edit]);
+
+    const pressPageName = () => {
+        Vibration.vibrate(10);
+        setEdit(true);
+    }
+
+    const changePageName = (e) => {
+        const text = e.nativeEvent.text;
+        if (text === "") {
+            Alert.alert("오류", "페이지 이름을 입력해주세요", [{ text: "확인" }], { cancelable: true });
+            textInputRef.current.setNativeProps({ text: props.pageName, });
+            setEdit(false);
+            return;
+        }
+        if (props.pageName != text) {
+            props.changePageName(props.index, text, textInputRef);
+        }
+        setEdit(false);
+    }
+
+
     return (
-        <View key={props.index} style={styles.page}>
+        <View style={styles.page}>
             <View style={styles.cart}>
                 <View style={styles.cart_title}>
-                    <Text style={styles.cart_title_text}>{props.pageName}</Text>
+                    <TouchableOpacity onLongPress={pressPageName}>
+                        <TextInput ref={textInputRef} style={styles.cart_title_text} defaultValue={props.pageName}
+                            editable={edit} onEndEditing={changePageName} ></TextInput>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={props.doubleCheckDeletePage}>
                         <MaterialIcons name="remove-circle-outline" size={30} color={theme.subFont} />
                     </TouchableOpacity>
                 </View>
                 <ScrollView style={styles.cart_list}>
-                    { Object.keys(items).filter((key) => !items[key].check).map((key) =>
+                    {Object.keys(items).filter((key) => !items[key].check).map((key) =>
                         <Item key={key} value={key} text={items[key].text} check={items[key].check}
-                            onCheckItem={props.onCheckItem} doubleCheckDeleteItem={props.doubleCheckDeleteItem} />) }
+                            onCheckItem={props.onCheckItem} doubleCheckDeleteItem={props.doubleCheckDeleteItem} />)}
                     <View style={styles.divideLine}></View>
-                    { Object.keys(items).filter((key) => items[key].check).map((key) =>
+                    {Object.keys(items).filter((key) => items[key].check).map((key) =>
                         <Item key={key} value={key} text={items[key].text} check={items[key].check}
-                            onCheckItem={props.onCheckItem} doubleCheckDeleteItem={props.doubleCheckDeleteItem} />) }
+                            onCheckItem={props.onCheckItem} doubleCheckDeleteItem={props.doubleCheckDeleteItem} />)}
 
                 </ScrollView>
             </View>
