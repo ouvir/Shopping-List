@@ -62,3 +62,6 @@ const styles = StyleSheet.create({
     flex: 0.1,
   },
 });
+
+// build
+// eas build -p android --profile preview

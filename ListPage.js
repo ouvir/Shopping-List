@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, ScrollView, TextInput, Text, TouchableOpacity, Pressable, Alert, Vibration, Modal } from 'react-native';
+import { StyleSheet, View, ScrollView, TextInput, Text, TouchableOpacity, Pressable, Alert, Vibration, Modal, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { theme } from './colors';
 import { useState, useRef, useEffect } from 'react';
@@ -9,6 +9,8 @@ import Calendar from './Calendar';
 
 const ITEM_STORAGE_KEY = "@Items";
 const PAGE_STORAGE_KEY = "@Pages";
+
+const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get("window");
 
 export const ListPage = () => {
     const [text, setText] = useState(""); // input text
@@ -251,7 +253,7 @@ export const ListPage = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 9,
-        width: "100%",
+        width: DEVICE_WIDTH,
         backgroundColor: theme.background,
         alignItems: 'center',
         justifyContent: "space-between",
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
     navBar: {
         flex: 1,
         flexDirection: "row",
-        width: "100%",
+        width: DEVICE_WIDTH,
         justifyContent: "space-between",
         alignItems: "center",
         paddingHorizontal: 20,
@@ -275,7 +277,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 18,
         fontWeight: "500",
-        width: "90%",
+        width: DEVICE_WIDTH * 0.9,
         backgroundColor: theme.subBackground,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -293,7 +295,7 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(0,0,0,0.4)",
     },
     modalView: {
-        width: "95%",
+        width: DEVICE_WIDTH *0.95,
         height: 300,
         backgroundColor: theme.subBackground,
         borderRadius: 5,

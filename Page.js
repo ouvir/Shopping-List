@@ -4,7 +4,7 @@ import { theme } from './colors';
 import React from 'react';
 import { useState, useRef, useEffect } from 'react';
 
-const { width: DEVICE_WIDTH } = Dimensions.get("window");
+const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get("window");
 
 const Item = (props) => {
     return (
@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
     },
 
     cart: {
-        width: "90%",
-        height: "95%",
+        width: DEVICE_WIDTH * 0.9,
+        height: DEVICE_HEIGHT * 0.95,
         alignItems: 'center',
         borderRadius: 10,
         borderColor: theme.border,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     },
 
     cart_title: {
-        width: "100%",
+        width: DEVICE_WIDTH * 0.8,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     },
 
     cart_list: {
-        width: "100%",
+        width: DEVICE_WIDTH * 0.9,
         paddingHorizontal: 10,
         paddingVertical: 10
     },
