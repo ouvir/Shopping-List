@@ -3,7 +3,7 @@ import { theme } from './colors';
 import ListPage from './ListPage';
 import { MaterialIcons } from '@expo/vector-icons';
 
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import AnalysisPage from './AnalysisPage';
@@ -26,7 +26,7 @@ const Navigation = () => {
             )
           }} />
 
-        {/* <Tab.Screen name="Search" component={HistoryPage}
+        <Tab.Screen name="Search" component={HistoryPage}
           options={{
             title: '알림', headerShown: false,
             tabBarIcon: ({ color }) => (
@@ -48,7 +48,7 @@ const Navigation = () => {
             tabBarIcon: ({ color }) => (
               <MaterialIcons name="account-circle" size={ICON_SIZE} color={color} />
             )
-          }} /> */}
+          }} />
 
       </Tab.Navigator>
     </NavigationContainer>
