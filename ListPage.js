@@ -231,7 +231,7 @@ export const ListPage = () => {
                         onScroll={onChangePage} ref={scrollViewRef} >
                         {
                             pages.map((value, index) =>
-                                <Page key={index} items={Object.entries(items).filter(([item]) => item.page === value.pageID).reduce((acc, [key, item]) => ({ ...acc, [key]: item }), {})}
+                                <Page key={index} items={Object.entries(items).filter(([key, item]) => item.page === value.pageID).reduce((acc, [key, item]) => ({ ...acc, [key]: item }), {})}
                                     pageName={value.name} index={index}
                                     doubleCheckDeletePage={() => doubleCheckDeletePage(index)} onCheckItem={onCheckItem}
                                     doubleCheckDeleteItem={doubleCheckDeleteItem} changePageName={changePageName} />
