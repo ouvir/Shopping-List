@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
 
     cart: {
         width: DEVICE_WIDTH * 0.9,
-        height: DEVICE_HEIGHT * 0.95,
+        height: DEVICE_HEIGHT * 0.7,
         alignItems: 'center',
         borderRadius: 10,
         borderColor: theme.border,
