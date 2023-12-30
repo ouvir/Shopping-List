@@ -6,7 +6,6 @@ import { theme } from './colors';
 export function Calendar(props) {
     return (
         <View style={styles.container}>
-            <StatusBar style="auto" />
             <View style={styles.header}>
                 <TouchableOpacity style={styles.button} onPress={props.goBack}>
                     <MaterialIcons name="view-list" size={24} color={theme.font} />

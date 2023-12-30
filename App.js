@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, StatusBar } from 'react-native';
 import { theme } from './colors';
 import ListPage from './ListPage';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -15,43 +15,43 @@ const Tab = createBottomTabNavigator();
 export default function App() {
 
   return (
-    // <ListPage></ListPage>
-    // <NavigationContainer>
-    //   <Tab.Navigator initialRouteName="Home"
-    //     screenOptions={{ tabBarActiveTintColor: theme.font, tabBarInactiveTintColor: theme.subFont, tabBarStyle: styles.tabBar, tabBarShowLabel: false }} >
-    //     <Tab.Screen name="Home" component={ListPage}
-    //       options={{
-    //         title: '홈', headerShown: false,
-    //         tabBarIcon: ({ color }) => (
-    //           <MaterialIcons name="list-alt" size={ICON_SIZE} color={color} />
-    //         ) }} />
+    <NavigationContainer>
+      <Tab.Navigator initialRouteName="Search"
+        screenOptions={{ tabBarActiveTintColor: theme.font, tabBarInactiveTintColor: theme.subFont, tabBarStyle: styles.tabBar, tabBarShowLabel: false }} >
+        {/* <Tab.Screen name="Home" component={ListPage}
+          options={{
+            title: '홈', headerShown: false,
+            tabBarIcon: ({ color }) => (
+              <MaterialIcons name="list-alt" size={ICON_SIZE} color={color} />
+            )
+          }} /> */}
 
-    //     <Tab.Screen name="Search" component={HistoryPage}
-    //       options={{
-    //         title: '알림', headerShown: false,
-    //         tabBarIcon: ({ color }) => (
-    //           <MaterialIcons name="library-books" size={ICON_SIZE} color={color} />
-    //         ) }} />
+        <Tab.Screen name="Search" component={HistoryPage}
+          options={{
+            title: '알림', headerShown: false,
+            tabBarIcon: ({ color }) => (
+              <MaterialIcons name="library-books" size={ICON_SIZE} color={color} />
+            )
+          }} />
 
-    //     <Tab.Screen name="Notification" component={AnalysisPage}
-    //       options={{
-    //         title: '검색', headerShown: false,
-    //         tabBarIcon: ({ color }) => (
-    //           <MaterialIcons name="analytics" size={ICON_SIZE} color={color} />
-    //         ) }} />
+        <Tab.Screen name="Notification" component={AnalysisPage}
+          options={{
+            title: '검색', headerShown: false,
+            tabBarIcon: ({ color }) => (
+              <MaterialIcons name="analytics" size={ICON_SIZE} color={color} />
+            )
+          }} />
 
-    //     <Tab.Screen name="Message" component={AccountPage}
-    //       options={{
-    //         title: '메시지', headerShown: false,
-    //         tabBarIcon: ({ color }) => (
-    //           <MaterialIcons name="account-circle" size={ICON_SIZE} color={color} />
-    //         ) }} />
+        <Tab.Screen name="Message" component={AccountPage}
+          options={{
+            title: '메시지', headerShown: false,
+            tabBarIcon: ({ color }) => (
+              <MaterialIcons name="account-circle" size={ICON_SIZE} color={color} />
+            )
+          }} />
 
-    //   </Tab.Navigator>
-    // </NavigationContainer>
-    <View>
-      <Text>Hi</Text>
-    </View>
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 
