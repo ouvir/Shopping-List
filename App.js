@@ -16,17 +16,17 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Tab.Navigator initialRouteName="Search"
+      <Tab.Navigator initialRouteName="Home"
         screenOptions={{ tabBarActiveTintColor: theme.font, tabBarInactiveTintColor: theme.subFont, tabBarStyle: styles.tabBar, tabBarShowLabel: false }} >
-        {/* <Tab.Screen name="Home" component={ListPage}
+        <Tab.Screen name="Home" component={ListPage}
           options={{
             title: '홈', headerShown: false,
             tabBarIcon: ({ color }) => (
               <MaterialIcons name="list-alt" size={ICON_SIZE} color={color} />
             )
-          }} /> */}
+          }} />
 
-        <Tab.Screen name="Search" component={HistoryPage}
+        {/* <Tab.Screen name="Search" component={HistoryPage}
           options={{
             title: '알림', headerShown: false,
             tabBarIcon: ({ color }) => (
@@ -48,7 +48,7 @@ export default function App() {
             tabBarIcon: ({ color }) => (
               <MaterialIcons name="account-circle" size={ICON_SIZE} color={color} />
             )
-          }} />
+          }} /> */}
 
       </Tab.Navigator>
     </NavigationContainer>
