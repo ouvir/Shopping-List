@@ -13,7 +13,7 @@ import AccountPage from './AccountPage';
 const ICON_SIZE = 30;
 const Tab = createBottomTabNavigator();
 
-const Navigation = () => {
+const Navigation = (navigation) => {
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Home"
@@ -26,25 +26,25 @@ const Navigation = () => {
             )
           }} />
 
-        <Tab.Screen name="Search" component={HistoryPage}
+        <Tab.Screen name="History" component={HistoryPage}
           options={{
-            title: '알림', headerShown: false,
+            title: '기록', headerShown: false,
             tabBarIcon: ({ color }) => (
               <MaterialIcons name="library-books" size={ICON_SIZE} color={color} />
             )
           }} />
 
-        <Tab.Screen name="Notification" component={AnalysisPage}
+        <Tab.Screen name="Analysis" component={AnalysisPage}
           options={{
-            title: '검색', headerShown: false,
+            title: '분석', headerShown: false,
             tabBarIcon: ({ color }) => (
               <MaterialIcons name="analytics" size={ICON_SIZE} color={color} />
             )
           }} />
 
-        <Tab.Screen name="Message" component={AccountPage}
+        <Tab.Screen name="Account" component={AccountPage}
           options={{
-            title: '메시지', headerShown: false,
+            title: '계정', headerShown: false,
             tabBarIcon: ({ color }) => (
               <MaterialIcons name="account-circle" size={ICON_SIZE} color={color} />
             )
@@ -63,14 +63,8 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.background,
-    alignItems: 'center',
-    justifyContent: "space-between",
-  },
   tabBar: {
-    flex: 0.1,
+    // flex: 0.1,
   },
 });
 

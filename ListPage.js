@@ -1,25 +1,91 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, ScrollView, TextInput, Text, TouchableOpacity, Pressable, Alert, Vibration, Modal, Dimensions } from 'react-native';
+import { StyleSheet, View, ScrollView, TextInput, Text, TouchableOpacity, Alert, Vibration, Modal, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { theme } from './colors';
 import { useState, useRef, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Page from './Page';
-import Calendar from './Calendar';
 
 const ITEM_STORAGE_KEY = "@Items";
 const PAGE_STORAGE_KEY = "@Pages";
 
 const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get("window");
 
-export const ListPage = () => {
+const ModalToAddPage = (props) => {
+    const [modalText, setModalText] = useState("");
+    return (
+        <Modal
+            transparent={true}
+            visible={props.modalVisible}
+            onRequestClose={() => {
+                Alert.alert('시간 초과');
+                props.setModalVisible(false);
+            }}>
+            <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                    <Text style={styles.modalText}>새 페이지 추가</Text>
+                    <TextInput ref={props.textInputRef} style={styles.modalTextInput}
+                        onChangeText={(text) => setModalText(text)} placeholder={"페이지 이름"}
+                        onSubmitEditing={() => { props.addPage(modalText); setModalText("") }}
+                    />
+                    <View style={styles.modalButton}>
+                        <TouchableOpacity
+                            style={[styles.button, styles.buttonAdd]}
+                            onPress={() => { props.addPage(modalText); setModalText("") }}>
+                            <Text style={styles.buttonText}>추가</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.button, styles.buttonCancle]}
+                            onPress={() => { props.setModalVisible(false); setModalText("") }}>
+                            <Text style={styles.buttonText}>취소</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        </Modal>
+    );
+}
+const NavBar = (props) => {
+    return (
+        <View style={styles.navBar}>
+            <TouchableOpacity onPress={() => props.setModalVisible(true)}>
+                <MaterialIcons name="post-add" size={30} color={theme.font} />
+            </TouchableOpacity>
+            {
+                props.pageSize === 0 ? null :
+                    <TouchableOpacity onPress={() => props.doubleCheckDeletePage()}>
+                        <MaterialIcons name="delete" size={30} color={theme.font} />
+                    </TouchableOpacity>
+            }
+
+        </View>
+    );
+}
+const MainView = (props) => {
+    return (
+        <View style={styles.shoppingList}>
+            <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}
+                onScroll={props.onChangePage} ref={props.scrollViewRef} >
+                {
+                    props.pages.map((value, index) =>
+                        <Page key={index} items={Object.entries(props.items).filter(([key, item]) => item.page === value.pageID).reduce((acc, [key, item]) => ({ ...acc, [key]: item }), {})}
+                            pageName={value.name} index={index} onCheckItem={props.onCheckItem}
+                            doubleCheckDeleteItem={props.doubleCheckDeleteItem} changePageName={props.changePageName}
+                            navigation={props.navigation} />
+                    )
+                }
+            </ScrollView>
+        </View>
+    );
+}
+
+
+export const ListPage = (props) => {
     const [text, setText] = useState(""); // input text
     const [items, setItems] = useState({});
     const [page, setPage] = useState(0); // current user show page index
     const [pages, setPages] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
-    const [modalText, setModalText] = useState("");
-    const [display, setDisplay] = useState(0);
 
     const scrollViewRef = useRef(null);
     const textInputRef = useRef();
@@ -31,13 +97,12 @@ export const ListPage = () => {
 
     // about text
     const onChangeText = (payload) => setText(payload);
-
     const isSpecialText = (text) => {
-        const specia_pattern = /[^a-zA-Z0-9가-힣ㄱ-ㅎ]/g;
+        const specia_pattern = /[^a-zA-Z0-9가-힣ㄱ-ㅎ ]/g;
         return specia_pattern.test(text);
     }
 
-    // about item
+    // about item => {[Date.now()]: { page: pages[page].pageID, text: text, check: false } };
     const saveItemsForAsyncStorage = async (saveData) => {
         try {
             await AsyncStorage.setItem(ITEM_STORAGE_KEY, JSON.stringify(saveData));
@@ -88,10 +153,7 @@ export const ListPage = () => {
         setItems(newItems);
         saveItemsForAsyncStorage(newItems);
     }
-
-    // item 이름 14글자 이하
-    // item 이름 특수문자 불가능
-    const isCorrectItemName = (name) => {
+    const isCorrectItemName = (name) => {    // item 이름 14글자 이하, item 이름 특수문자 불가능
         if (name.length > 14) return false;
         if (isSpecialText(name)) return false;
         return true;
@@ -118,22 +180,31 @@ export const ListPage = () => {
         }
     }
 
-    const addPage = () => {
-        if (!isCorrectPageName(modalText)) {
+    const addPage = (pageName) => {
+        if (!isCorrectPageName(pageName)) {
             alert("리스트의 제목은 10글자를 넘길 수 없고, 특수문자를 사용할 수 없습니다.");
             return
         }
 
+        let name = pageName;
         const timestamp = Date.now();
         const dateObj = new Date(Date.now());
         const date = dateObj.getFullYear() + '.' + (dateObj.getMonth() + 1) + '.' + dateObj.getDate();
-        const newPages = [{ pageID: timestamp, name: modalText, date: date }, ...pages];
-        setModalText("");
+
+        // name is not blank, change default value = date
+        if (name === "") {
+            name = "새 페이지";
+        }
+
+        const newPages = [{ pageID: timestamp, name: name, date: date }, ...pages];
         setModalVisible(false);
         setPages(newPages);
         savePagesForAsyncStorage(newPages);
     }
-    const doubleCheckDeletePage = (index) => {
+    const doubleCheckDeletePage = () => {
+        if (pages.length === 0) return
+
+        const index = page;
         Alert.alert("이 목록을 삭제하시겠습니까?", pages[index].name, [
             { text: "삭제", onPress: () => deletePage(index) },
             { text: "취소" }
@@ -177,9 +248,7 @@ export const ListPage = () => {
         setPages(newPages);
         savePagesForAsyncStorage(newPages);
     }
-    // page 이름 10글자이하
-    // page 이름 특수문자 불가능
-    const isCorrectPageName = (name) => {
+    const isCorrectPageName = (name) => {     // page 이름 10글자이하, page 이름 특수문자 불가능
         if (name.length > 10) return false;
         if (isSpecialText(name)) return false;
         return true;
@@ -187,65 +256,28 @@ export const ListPage = () => {
 
 
     return (
-        display === 0 ?
-            <View style={styles.container}>
-                <StatusBar style="auto" />
-                <Modal
-                    transparent={true}
-                    visible={modalVisible}
-                    onRequestClose={() => {
-                        Alert.alert('시간 초과');
-                        setModalVisible(false);
-                    }}>
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                            <Text style={styles.modalText}>페이지 이름:</Text>
-                            <TextInput ref={textInputRef} style={styles.modalTextInput} onChangeText={(text) => setModalText(text)}>{modalText}</TextInput>
-                            <View style={styles.modalButton}>
-                                <Pressable
-                                    style={[styles.button, styles.buttonAdd]}
-                                    onPress={() => addPage()}>
-                                    <Text style={styles.buttonText}>추가</Text>
-                                </Pressable>
-                                <Pressable
-                                    style={[styles.button, styles.buttonCancle]}
-                                    onPress={() => setModalVisible(false)}>
-                                    <Text style={styles.buttonText}>취소</Text>
-                                </Pressable>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
+        <View style={styles.container}>
+            <StatusBar style="auto" />
 
-                <View style={styles.navBar}>
-                    <Pressable onPress={() => setModalVisible(true)}>
-                        <MaterialIcons name="post-add" size={30} color={theme.font} />
-                    </Pressable>
-                    <TouchableOpacity onPress={() => setDisplay(1)}>
-                        <MaterialIcons name="calendar-today" size={24} color={theme.font} />
-                    </TouchableOpacity>
-                </View>
+            <ModalToAddPage textInputRef={textInputRef} setModalVisible={setModalVisible} addPage={addPage} modalVisible={modalVisible} />
 
-                <View style={styles.shopping_list}>
-                    <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}
-                        onScroll={onChangePage} ref={scrollViewRef} >
-                        {
-                            pages.map((value, index) =>
-                                <Page key={index} items={Object.entries(items).filter(([key, item]) => item.page === value.pageID).reduce((acc, [key, item]) => ({ ...acc, [key]: item }), {})}
-                                    pageName={value.name} index={index}
-                                    doubleCheckDeletePage={() => doubleCheckDeletePage(index)} onCheckItem={onCheckItem}
-                                    doubleCheckDeleteItem={doubleCheckDeleteItem} changePageName={changePageName} />
-                            )
-                        }
-                    </ScrollView>
-                </View>
+            <NavBar setModalVisible={setModalVisible} doubleCheckDeletePage={doubleCheckDeletePage} pageSize={pages.length}/>
 
-                <TextInput style={styles.input} placeholder="+  목록 추가" value={text} onChangeText={onChangeText} onSubmitEditing={addItem} />
-            </View>
-
-            :
-            <Calendar goBack={() => setDisplay(0)}></Calendar>
-            
+            {pages.length === 0 ?
+                <TouchableOpacity style={styles.blankPage} onPress={() => setModalVisible(true)}>
+                    <MaterialIcons name="post-add" size={200} color={theme.subFont} />
+                    <Text style={styles.blankPageText}>목록을 추가해주세요</Text>
+                </TouchableOpacity>
+                :
+                [
+                    <MainView key="main" navigation={props.navigation} onChangePage={onChangePage} scrollViewRef={scrollViewRef} pages={pages} items={items}
+                        doubleCheckDeleteItem={doubleCheckDeleteItem} onCheckItem={onCheckItem}
+                        changePageName={changePageName} setModalVisible={setModalVisible} />
+                    ,
+                    <TextInput key="input" style={styles.input} placeholder="+  목록 추가" value={text} onChangeText={onChangeText} onSubmitEditing={addItem} />
+                ]
+            }
+        </View>
     );
 }
 
@@ -258,7 +290,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
     navBar: {
-        flex: 1,
         flexDirection: "row",
         width: DEVICE_WIDTH,
         justifyContent: "space-between",
@@ -267,34 +298,47 @@ const styles = StyleSheet.create({
         marginTop: 60,
         marginBottom: 10
     },
-    shopping_list: {
+    shoppingList: {
         flex: 16,
         alignItems: "center"
     },
 
-    input: {
+    blankPage: {
         flex: 1,
-        fontSize: 18,
+        width: DEVICE_WIDTH,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingBottom: DEVICE_HEIGHT * 0.1,
+    },
+    blankPageText: {
+        fontSize: 24,
         fontWeight: "500",
+        color: theme.subFont,
+    },
+
+    input: {
+        fontSize: 18,
+        fontWeight: "600",
         width: DEVICE_WIDTH * 0.9,
         backgroundColor: theme.subBackground,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderColor: theme.border,
         borderWidth: 1,
-        borderRadius: 20,
-        marginBottom: 10
+        borderRadius: 10,
+        marginVertical: 10,
     },
 
-
+    // WindowToAddPage
     centeredView: {
         flex: 1,
         justifyContent: 'center',
         alignItems: "center",
-        backgroundColor: "rgba(0,0,0,0.4)",
+        backgroundColor: "rgba(0,0,0,0.3)",
+        paddingBottom: DEVICE_HEIGHT * 0.1,
     },
     modalView: {
-        width: DEVICE_WIDTH *0.95,
+        width: DEVICE_WIDTH * 0.95,
         height: 300,
         backgroundColor: theme.subBackground,
         borderRadius: 5,
@@ -318,7 +362,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         borderColor: "grey",
         textAlign: "left",
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: "600",
         paddingVertical: 10,
         paddingHorizontal: 20
@@ -329,7 +373,6 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         justifyContent: "flex-end",
     },
-
     button: {
         width: 80,
         borderRadius: 5,

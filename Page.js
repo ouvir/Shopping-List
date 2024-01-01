@@ -1,4 +1,4 @@
-import { StyleSheet, Text, ScrollView, View, TouchableOpacity, Dimensions, TextInput, Vibration, Alert } from 'react-native';
+import { StyleSheet, Text, ScrollView, View, TouchableOpacity, Dimensions, TextInput, Vibration, Alert, Keyboard } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { theme } from './colors';
 import React from 'react';
@@ -20,6 +20,7 @@ const Item = (props) => {
 //get index, items, pageName
 export const Page = (props) => {
     const [edit, setEdit] = useState(false);
+    const [keyboardStatus, setKeyboardStatus] = useState(false);
     const textInputRef = useRef();
     const items = props.items;
 
@@ -29,6 +30,18 @@ export const Page = (props) => {
         if (edit && textInputRef.current) {
             textInputRef.current.focus();
         }
+
+        const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardStatus(true);
+        });
+        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardStatus(false);
+        });
+
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+        };
     }, [edit]);
 
     const pressPageName = () => {
@@ -50,7 +63,6 @@ export const Page = (props) => {
         setEdit(false);
     }
 
-
     return (
         <View style={styles.page}>
             <View style={styles.cart}>
@@ -58,9 +70,6 @@ export const Page = (props) => {
                     <TouchableOpacity onLongPress={pressPageName}>
                         <TextInput ref={textInputRef} style={styles.cart_title_text} defaultValue={props.pageName}
                             editable={edit} onEndEditing={changePageName} ></TextInput>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={props.doubleCheckDeletePage}>
-                        <MaterialIcons name="remove-circle-outline" size={30} color={theme.subFont} />
                     </TouchableOpacity>
                 </View>
                 <ScrollView style={styles.cart_list}>
@@ -73,6 +82,15 @@ export const Page = (props) => {
                             onCheckItem={props.onCheckItem} doubleCheckDeleteItem={props.doubleCheckDeleteItem} />)}
 
                 </ScrollView>
+                {
+                    !keyboardStatus && Object.keys(items).length != 0 && Object.keys(items).filter((key) => !items[key].check).length === 0 ?
+                        <View style={styles.settleUp}>
+                            <TouchableOpacity style={styles.settleUpButton} onPress={() => props.navigation.navigate("History",items)}>
+                                <Text style={styles.settleUpButtonText}> 정산하기 </Text>
+                            </TouchableOpacity>
+                        </View>
+                        : null
+                }
             </View>
         </View>
     )
@@ -88,6 +106,7 @@ const styles = StyleSheet.create({
     },
 
     cart: {
+        flex: 1,
         width: DEVICE_WIDTH * 0.9,
         height: DEVICE_HEIGHT * 0.7,
         alignItems: 'center',
@@ -98,7 +117,7 @@ const styles = StyleSheet.create({
     },
 
     cart_title: {
-        width: DEVICE_WIDTH * 0.8,
+        width: DEVICE_WIDTH * 0.9,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
@@ -117,7 +136,7 @@ const styles = StyleSheet.create({
     cart_list: {
         width: DEVICE_WIDTH * 0.9,
         paddingHorizontal: 10,
-        paddingVertical: 10
+        marginVertical: 10
     },
 
     item: {
@@ -151,6 +170,27 @@ const styles = StyleSheet.create({
         borderColor: theme.border,
         marginVertical: 5,
         marginBottom: 10,
+    }
+    ,
+    settleUp: {
+        width: DEVICE_WIDTH * 0.9,
+        borderTopWidth: 1,
+        borderColor: theme.border,
+        justifyContent: "center",
+        alignItems:"center"
+    },
+    settleUpButton: {
+        width: DEVICE_WIDTH * 0.6,
+        backgroundColor: theme.background,
+        borderRadius: 5,
+        marginVertical: 10,
+    },
+    settleUpButtonText: {
+        fontSize: 24,
+        color: theme.subFont,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        textAlign: 'center',
     }
 });
 
