@@ -1,10 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, ScrollView, TextInput, Text, TouchableOpacity, Alert, Vibration, Modal, Dimensions } from 'react-native';
+import { StyleSheet,useColorScheme, View, ScrollView, TextInput, Text, TouchableOpacity, Alert, Vibration, Modal, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useState, useRef, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { darkTheme, lightTheme } from './theme';
 import Page from './Page';
-import { theme } from './colors';
 
 const ITEM_STORAGE_KEY = "@Items";
 const PAGE_STORAGE_KEY = "@Pages";
@@ -13,6 +13,73 @@ const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get("window");
 
 const ModalToAddPage = (props) => {
     const [modalText, setModalText] = useState("");
+    const { theme } = props;
+    const styles = StyleSheet.create({
+        centeredView: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            paddingBottom: DEVICE_HEIGHT * 0.1,
+        },
+        modalView: {
+            width: DEVICE_WIDTH * 0.95,
+            height: 300,
+            backgroundColor: theme.background[1],
+            borderRadius: 5,
+            padding: 30,
+            shadowColor: '#000',
+            shadowOffset: {
+                width: 1,
+                height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+            elevation: 5,
+            justifyContent: "space-between"
+        },
+        modalText: {
+            fontSize: 24,
+            fontWeight: "500",
+            color: theme.font[0]
+        },
+        modalTextInput: {
+            color: theme.font[0],
+            borderWidth: 3,
+            borderRadius: 3,
+            borderColor: theme.border,
+            textAlign: "left",
+            fontSize: 20,
+            fontWeight: "600",
+            paddingVertical: 10,
+            paddingHorizontal: 20
+        },
+        modalButton: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            justifyContent: "flex-end",
+        },
+        button: {
+            width: 80,
+            borderRadius: 5,
+            padding: 10,
+            marginLeft: 3
+        },
+        buttonAdd: {
+            backgroundColor: theme.point,
+        },
+        buttonCancle: {
+            backgroundColor: theme.border,
+        },
+        buttonText: {
+            color: theme.font[2],
+            fontSize: 15,
+            fontWeight: 'bold',
+            textAlign: 'center',
+        },
+    });
+
     return (
         <Modal
             transparent={true}
@@ -46,6 +113,19 @@ const ModalToAddPage = (props) => {
     );
 }
 const NavBar = (props) => {
+    const { theme } = props;
+    const styles = StyleSheet.create({
+        navBar: {
+            flexDirection: "row",
+            width: DEVICE_WIDTH,
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingHorizontal: 20,
+            marginTop: 60,
+            marginBottom: 10
+        },
+    });
+
     return (
         <View style={styles.navBar}>
             <TouchableOpacity onPress={() => props.setModalVisible(true)}>
@@ -62,13 +142,20 @@ const NavBar = (props) => {
     );
 }
 const MainView = (props) => {
+    const { theme } = props;
+    const styles = StyleSheet.create({
+        shoppingList: {
+            flex: 16,
+            alignItems: "center"
+        },
+    });
     return (
         <View style={styles.shoppingList}>
             <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}
                 onScroll={props.onChangePage} ref={props.scrollViewRef} >
                 {
                     props.pages.map((value, index) =>
-                        <Page key={index} items={Object.entries(props.items).filter(([key, item]) => item.page === value.pageID).reduce((acc, [key, item]) => ({ ...acc, [key]: item }), {})}
+                        <Page theme={theme} key={index} items={Object.entries(props.items).filter(([key, item]) => item.page === value.pageID).reduce((acc, [key, item]) => ({ ...acc, [key]: item }), {})}
                             pageName={value.name} index={index} onCheckItem={props.onCheckItem}
                             doubleCheckDeleteItem={props.doubleCheckDeleteItem} changePageName={props.changePageName}
                             navigation={props.navigation} />
@@ -80,21 +167,61 @@ const MainView = (props) => {
 }
 
 
-export const ListPage = (props) => {
+export const ListPage = ({ navigation }) => {
     const [text, setText] = useState(""); // input text
     const [items, setItems] = useState({});
     const [page, setPage] = useState(0); // current user show page index
     const [pages, setPages] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
+    const theme = useColorScheme() === 'dark' ? darkTheme : lightTheme;
 
     const scrollViewRef = useRef(null);
     const textInputRef = useRef();
 
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 9,
+            width: DEVICE_WIDTH,
+            backgroundColor: theme.background[0],
+            alignItems: 'center',
+            justifyContent: "space-between",
+        },
+
+        blankPage: {
+            flex: 1,
+            width: DEVICE_WIDTH,
+            alignItems: "center",
+            justifyContent: "center",
+            paddingBottom: DEVICE_HEIGHT * 0.1,
+        },
+        blankPageText: {
+            fontSize: 24,
+            fontWeight: "500",
+            color: theme.font[1],
+        },
+
+        input: {
+            color: theme.font[0],
+            fontSize: 18,
+            fontWeight: "600",
+            width: DEVICE_WIDTH * 0.9,
+            backgroundColor: theme.background[1],
+            paddingVertical: 12,
+            paddingHorizontal: 20,
+            borderColor: theme.border,
+            borderWidth: 1,
+            borderRadius: 5,
+            marginVertical: 15,
+        },
+
+    });
+
     useEffect(() => {
         loadPagesForAsyncStorage();
         loadItemsForAsyncStorage();
     }, []);
+
 
     // about text
     const onChangeText = (payload) => setText(payload);
@@ -255,14 +382,13 @@ export const ListPage = (props) => {
         return true;
     }
 
-
     return (
         <View style={styles.container}>
             <StatusBar style="auto" />
 
             <ModalToAddPage theme={theme} textInputRef={textInputRef} setModalVisible={setModalVisible} addPage={addPage} modalVisible={modalVisible} />
 
-            <NavBar setModalVisible={setModalVisible} doubleCheckDeletePage={doubleCheckDeletePage} pageSize={pages.length} />
+            <NavBar theme={theme} setModalVisible={setModalVisible} doubleCheckDeletePage={doubleCheckDeletePage} pageSize={pages.length} />
 
             {pages.length === 0 ?
                 <TouchableOpacity style={styles.blankPage} onPress={() => setModalVisible(true)}>
@@ -271,7 +397,7 @@ export const ListPage = (props) => {
                 </TouchableOpacity>
                 :
                 [
-                    <MainView key="main" navigation={props.navigation} onChangePage={onChangePage} scrollViewRef={scrollViewRef} pages={pages} items={items}
+                    <MainView theme={theme} key="main" navigation={navigation} onChangePage={onChangePage} scrollViewRef={scrollViewRef} pages={pages} items={items}
                         doubleCheckDeleteItem={doubleCheckDeleteItem} onCheckItem={onCheckItem}
                         changePageName={changePageName} setModalVisible={setModalVisible} />
                     ,
@@ -283,120 +409,5 @@ export const ListPage = (props) => {
     );
 }
 
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 9,
-        width: DEVICE_WIDTH,
-        backgroundColor: theme.background[0],
-        alignItems: 'center',
-        justifyContent: "space-between",
-    },
-    navBar: {
-        flexDirection: "row",
-        width: DEVICE_WIDTH,
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingHorizontal: 20,
-        marginTop: 60,
-        marginBottom: 10
-    },
-    shoppingList: {
-        flex: 16,
-        alignItems: "center"
-    },
-
-    blankPage: {
-        flex: 1,
-        width: DEVICE_WIDTH,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingBottom: DEVICE_HEIGHT * 0.1,
-    },
-    blankPageText: {
-        fontSize: 24,
-        fontWeight: "500",
-        color: theme.font[1],
-    },
-
-    input: {
-        fontSize: 18,
-        fontWeight: "600",
-        width: DEVICE_WIDTH * 0.9,
-        backgroundColor: theme.background[1],
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderColor: theme.border,
-        borderWidth: 1,
-        borderRadius: 5,
-        marginVertical: 15,
-    },
-
-    // WindowToAddPage
-    centeredView: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: "center",
-        backgroundColor: "rgba(0,0,0,0.5)",
-        paddingBottom: DEVICE_HEIGHT * 0.1,
-    },
-    modalView: {
-        width: DEVICE_WIDTH * 0.95,
-        height: 300,
-        backgroundColor: theme.background[1],
-        borderRadius: 5,
-        padding: 30,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 1,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-        justifyContent: "space-between"
-    },
-    modalText: {
-        fontSize: 24,
-        fontWeight: "500",
-        color: theme.font[0]
-    },
-    modalTextInput: {
-        borderWidth: 3,
-        borderRadius: 3,
-        borderColor: theme.border,
-        textAlign: "left",
-        fontSize: 20,
-        fontWeight: "600",
-        paddingVertical: 10,
-        paddingHorizontal: 20
-    },
-    modalButton: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-end",
-        justifyContent: "flex-end",
-    },
-    button: {
-        width: 80,
-        borderRadius: 5,
-        padding: 10,
-        marginLeft: 3,
-        // borderWidth: 1,
-        // borderColor: theme.border
-    },
-    buttonAdd: {
-        backgroundColor: theme.point,
-    },
-    buttonCancle: {
-        backgroundColor: theme.border,
-    },
-    buttonText: {
-        color: theme.font[2],
-        fontSize: 15,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-});
 
 export default ListPage;
