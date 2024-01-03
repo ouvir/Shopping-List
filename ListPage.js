@@ -1,10 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, ScrollView, TextInput, Text, TouchableOpacity, Alert, Vibration, Modal, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { theme } from './colors';
 import { useState, useRef, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Page from './Page';
+import { theme } from './colors';
 
 const ITEM_STORAGE_KEY = "@Items";
 const PAGE_STORAGE_KEY = "@Pages";
@@ -25,7 +25,7 @@ const ModalToAddPage = (props) => {
                 <View style={styles.modalView}>
                     <Text style={styles.modalText}>새 페이지 추가</Text>
                     <TextInput ref={props.textInputRef} style={styles.modalTextInput}
-                        onChangeText={(text) => setModalText(text)} placeholder={"페이지 이름"}
+                        onChangeText={(text) => setModalText(text)} placeholder={"페이지 이름"} placeholderTextColor={theme.font[1]}
                         onSubmitEditing={() => { props.addPage(modalText); setModalText("") }}
                     />
                     <View style={styles.modalButton}>
@@ -49,12 +49,12 @@ const NavBar = (props) => {
     return (
         <View style={styles.navBar}>
             <TouchableOpacity onPress={() => props.setModalVisible(true)}>
-                <MaterialIcons name="post-add" size={30} color={theme.font} />
+                <MaterialIcons name="post-add" size={30} color={theme.font[0]} />
             </TouchableOpacity>
             {
                 props.pageSize === 0 ? null :
                     <TouchableOpacity onPress={() => props.doubleCheckDeletePage()}>
-                        <MaterialIcons name="delete" size={30} color={theme.font} />
+                        <MaterialIcons name="delete" size={30} color={theme.font[0]} />
                     </TouchableOpacity>
             }
 
@@ -89,6 +89,7 @@ export const ListPage = (props) => {
 
     const scrollViewRef = useRef(null);
     const textInputRef = useRef();
+
 
     useEffect(() => {
         loadPagesForAsyncStorage();
@@ -259,13 +260,13 @@ export const ListPage = (props) => {
         <View style={styles.container}>
             <StatusBar style="auto" />
 
-            <ModalToAddPage textInputRef={textInputRef} setModalVisible={setModalVisible} addPage={addPage} modalVisible={modalVisible} />
+            <ModalToAddPage theme={theme} textInputRef={textInputRef} setModalVisible={setModalVisible} addPage={addPage} modalVisible={modalVisible} />
 
-            <NavBar setModalVisible={setModalVisible} doubleCheckDeletePage={doubleCheckDeletePage} pageSize={pages.length}/>
+            <NavBar setModalVisible={setModalVisible} doubleCheckDeletePage={doubleCheckDeletePage} pageSize={pages.length} />
 
             {pages.length === 0 ?
                 <TouchableOpacity style={styles.blankPage} onPress={() => setModalVisible(true)}>
-                    <MaterialIcons name="post-add" size={200} color={theme.subFont} />
+                    <MaterialIcons name="post-add" size={200} color={theme.font[1]} />
                     <Text style={styles.blankPageText}>목록을 추가해주세요</Text>
                 </TouchableOpacity>
                 :
@@ -274,18 +275,20 @@ export const ListPage = (props) => {
                         doubleCheckDeleteItem={doubleCheckDeleteItem} onCheckItem={onCheckItem}
                         changePageName={changePageName} setModalVisible={setModalVisible} />
                     ,
-                    <TextInput key="input" style={styles.input} placeholder="+  목록 추가" value={text} onChangeText={onChangeText} onSubmitEditing={addItem} />
+                    <TextInput key="input" style={styles.input} placeholder="+  목록 추가" placeholderTextColor={theme.font[1]}
+                        value={text} onChangeText={onChangeText} onSubmitEditing={addItem} />
                 ]
             }
         </View>
     );
 }
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 9,
         width: DEVICE_WIDTH,
-        backgroundColor: theme.background,
+        backgroundColor: theme.background[0],
         alignItems: 'center',
         justifyContent: "space-between",
     },
@@ -313,20 +316,20 @@ const styles = StyleSheet.create({
     blankPageText: {
         fontSize: 24,
         fontWeight: "500",
-        color: theme.subFont,
+        color: theme.font[1],
     },
 
     input: {
         fontSize: 18,
         fontWeight: "600",
         width: DEVICE_WIDTH * 0.9,
-        backgroundColor: theme.subBackground,
-        paddingVertical: 10,
+        backgroundColor: theme.background[1],
+        paddingVertical: 12,
         paddingHorizontal: 20,
         borderColor: theme.border,
         borderWidth: 1,
-        borderRadius: 10,
-        marginVertical: 10,
+        borderRadius: 5,
+        marginVertical: 15,
     },
 
     // WindowToAddPage
@@ -334,13 +337,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: "center",
-        backgroundColor: "rgba(0,0,0,0.3)",
+        backgroundColor: "rgba(0,0,0,0.5)",
         paddingBottom: DEVICE_HEIGHT * 0.1,
     },
     modalView: {
         width: DEVICE_WIDTH * 0.95,
         height: 300,
-        backgroundColor: theme.subBackground,
+        backgroundColor: theme.background[1],
         borderRadius: 5,
         padding: 30,
         shadowColor: '#000',
@@ -354,13 +357,14 @@ const styles = StyleSheet.create({
         justifyContent: "space-between"
     },
     modalText: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: "500",
+        color: theme.font[0]
     },
     modalTextInput: {
-        borderWidth: 2,
-        borderRadius: 5,
-        borderColor: "grey",
+        borderWidth: 3,
+        borderRadius: 3,
+        borderColor: theme.border,
         textAlign: "left",
         fontSize: 20,
         fontWeight: "600",
@@ -377,16 +381,18 @@ const styles = StyleSheet.create({
         width: 80,
         borderRadius: 5,
         padding: 10,
-        marginLeft: 3
+        marginLeft: 3,
+        // borderWidth: 1,
+        // borderColor: theme.border
     },
     buttonAdd: {
-        backgroundColor: theme.font,
+        backgroundColor: theme.point,
     },
     buttonCancle: {
-        backgroundColor: theme.subFont,
+        backgroundColor: theme.border,
     },
     buttonText: {
-        color: 'white',
+        color: theme.font[2],
         fontSize: 15,
         fontWeight: 'bold',
         textAlign: 'center',

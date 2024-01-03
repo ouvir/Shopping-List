@@ -11,10 +11,3 @@ export const darkTheme = {
     font: ["#CCCCCC", "grey", "#CCCCCC"],
     border: "#202020"
 }
-
-export const theme = {
-    background: ["#202020", "#1C1C1C", "#2A2A2A"],
-    point: "#495587",
-    font: ["#CCCCCC", "grey", "#CCCCCC"],
-    border: "#202020"
-}

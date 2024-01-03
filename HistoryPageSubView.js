@@ -32,7 +32,7 @@ const NavBar = (props) => {
     return (
         <View style={styles.navBar}>
             <TouchableOpacity style={styles.button} onPress={props.goBack}>
-                <MaterialIcons name="view-list" size={32} color={theme.font} />
+                <MaterialIcons name="view-list" size={32} color={theme.font[0]} />
             </TouchableOpacity>
 
             <Text style={styles.title}> Calendar </Text>
@@ -101,7 +101,7 @@ export function SubView(props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: theme.background,
+        backgroundColor: theme.background[0],
         alignItems: "center",
         justifyContent: "space-between"
     },
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     bottomSheet: {
         width: DEVICE_WIDTH,
         height: DEVICE_HEIGHT * 0.5,
-        backgroundColor: theme.subBackground,
+        backgroundColor: theme.background[1],
         borderRadius: 5,
         borderColor: theme.border,
         borderTopWidth: 2,

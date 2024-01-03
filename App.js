@@ -1,4 +1,4 @@
-import { StyleSheet, StatusBar } from 'react-native';
+import { StyleSheet, useColorScheme } from 'react-native';
 import { theme } from './colors';
 import ListPage from './ListPage';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -14,10 +14,11 @@ const ICON_SIZE = 30;
 const Tab = createBottomTabNavigator();
 
 const Navigation = (navigation) => {
+
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Home"
-        screenOptions={{ tabBarActiveTintColor: theme.font, tabBarInactiveTintColor: theme.subFont, tabBarStyle: styles.tabBar, tabBarShowLabel: false }} >
+        screenOptions={{tabBarActiveTintColor: theme.font[0], tabBarInactiveTintColor: theme.font[1], tabBarStyle: styles.tabBar, tabBarShowLabel: false }} >
         <Tab.Screen name="Home" component={ListPage}
           options={{
             title: '홈', headerShown: false,
@@ -64,7 +65,8 @@ export default function App() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    // flex: 0.1,
+    backgroundColor: theme.background[1],
+    borderTopColor: theme.border
   },
 });
 
