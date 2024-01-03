@@ -1,9 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet,useColorScheme, View, Text, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import SubView from './HistoryPageSubView';
 import { MaterialIcons } from '@expo/vector-icons';
-import { theme } from './colors';
+import { lightTheme, darkTheme } from './theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width: DEVICE_WIDTH, height: DEVICE_HEIGHT } = Dimensions.get("window");
@@ -12,6 +12,18 @@ const PAGE_STORAGE_KEY = "@Pages";
 
 
 const NavBar = (props) => {
+    const {theme} = props;
+    const styles = StyleSheet.create({
+        navBar: {
+            flexDirection: "row",
+            width: DEVICE_WIDTH,
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingHorizontal: 20,
+            marginTop: 60,
+            marginBottom: 10,
+        }
+    });
     return (
         <View style={styles.navBar}>
             <TouchableOpacity onPress={() => { }}>
@@ -25,9 +37,54 @@ const NavBar = (props) => {
 }
 
 const MainView = (props) => {
+    const {theme} = props;
+    const styles = StyleSheet.create({
+        mainView: {
+            flex: 1,
+            width: DEVICE_WIDTH,
+            justifyContent: "space-between",
+        },
+        listView: {
+            flex: 1,
+            width: DEVICE_WIDTH,
+            backgroundColor: theme.background[0],
+            alignItems: "flex-end",
+        },
+        scrollView: {
+            width: DEVICE_WIDTH * 0.9,
+            backgroundColor: theme.background[0],
+        },
+        page: {
+            height: DEVICE_HEIGHT * 0.1,
+            backgroundColor: theme.background[1],
+            marginBottom: 5,
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingHorizontal: 10,
+            borderRadius: 5,
+            flexDirection: "row",
+        },
+        pageInfo: {
+    
+        },
+        pageTitle: {
+            fontSize: 18,
+            fontWeight: "bold",
+            marginBottom: 2,
+            color: theme.font[0],
+        },
+        pageDate:{
+            color: theme.font[0],
+        },
+        price: {
+            fontSize: 23,
+            fontWeight: "bold",
+            color: theme.point
+        }
+    });
     return (
         <View style={styles.mainView}>
-            <NavBar key="navBar" setDisplay={props.setDisplay} />
+            <NavBar theme={theme} key="navBar" setDisplay={props.setDisplay} />
             <View style={styles.listView}>
                 <ScrollView style={styles.scrollView}>
                     {props.pages.map((item) =>
@@ -76,6 +133,17 @@ export const HistoryPage = (props) => {
     const [display, setDisplay] = useState(0);
     const [pages, setPages] = useState([]);
 
+    const theme = useColorScheme() === 'dark' ? darkTheme : lightTheme;
+    const styles = StyleSheet.create({
+        container: {
+            flex: 9,
+            width: DEVICE_WIDTH,
+            backgroundColor: theme.background[0],
+            alignItems: 'center',
+            justifyContent: "space-between",
+        }
+    });
+    
     useEffect(() => {
         loadPagesForAsyncStorage();
     }, []);
@@ -103,71 +171,11 @@ export const HistoryPage = (props) => {
             <StatusBar style="auto" />
 
             {display === 0 ?
-                <MainView pages={pages} key="mainView" setDisplay={setDisplay} />
+                <MainView theme={theme} pages={pages} key="mainView" setDisplay={setDisplay} />
                 :
-                <SubView goBack={() => setDisplay(0)} />}
+                <SubView theme={theme} goBack={() => setDisplay(0)} />}
         </View>
     );
 }
-const styles = StyleSheet.create({
-    container: {
-        flex: 9,
-        width: DEVICE_WIDTH,
-        backgroundColor: theme.background[0],
-        alignItems: 'center',
-        justifyContent: "space-between",
-    },
-    navBar: {
-        flexDirection: "row",
-        width: DEVICE_WIDTH,
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingHorizontal: 20,
-        marginTop: 60,
-        marginBottom: 10,
-    },
-    mainView: {
-        flex: 1,
-        width: DEVICE_WIDTH,
-        justifyContent: "space-between",
-    },
-    listView: {
-        flex: 1,
-        width: DEVICE_WIDTH,
-        backgroundColor: theme.background[0],
-        alignItems: "flex-end",
-    },
-    scrollView: {
-        width: DEVICE_WIDTH * 0.9,
-        backgroundColor: theme.background[0],
-    },
-    page: {
-        height: DEVICE_HEIGHT * 0.1,
-        backgroundColor: theme.background[1],
-        marginBottom: 5,
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        flexDirection: "row",
-    },
-    pageInfo: {
-
-    },
-    pageTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginBottom: 2,
-        color: theme.font[0],
-    },
-    pageDate:{
-        color: theme.font[0],
-    },
-    price: {
-        fontSize: 23,
-        fontWeight: "bold",
-        color: theme.point
-    }
-});
 
 export default HistoryPage;

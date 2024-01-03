@@ -1,5 +1,5 @@
 import { StyleSheet, useColorScheme } from 'react-native';
-import { theme } from './colors';
+import { darkTheme, lightTheme } from './theme';
 import ListPage from './ListPage';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -9,12 +9,22 @@ import { NavigationContainer } from "@react-navigation/native";
 import AnalysisPage from './AnalysisPage';
 import HistoryPage from './HistoryPage';
 import AccountPage from './AccountPage';
+import { useEffect, useState } from 'react';
 
 const ICON_SIZE = 30;
 const Tab = createBottomTabNavigator();
 
 const Navigation = (navigation) => {
+  const theme = useColorScheme() === 'dark' ? darkTheme : lightTheme;
 
+  const styles = StyleSheet.create({
+    tabBar: {
+      backgroundColor: theme.background[1],
+      borderTopColor: theme.border
+    },
+  });
+
+  
   return (
     <NavigationContainer>
       <Tab.Navigator initialRouteName="Home"
@@ -62,13 +72,6 @@ export default function App() {
     <Navigation></Navigation>
   );
 }
-
-const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: theme.background[1],
-    borderTopColor: theme.border
-  },
-});
 
 // build
 // eas build -p android --profile preview
